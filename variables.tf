@@ -13,7 +13,7 @@ variable "cidr_blocks" {
   default = ""
 }
 
-variable "route53_zone_zone_id" {
+variable "route53_zone_id" {
   default = ""
 }
 
@@ -38,6 +38,9 @@ variable "db_name" {
 variable "username" {
   default = ""
 }
+variable "port" {
+  default = "5432"
+}
 variable "multi_az" {
   default = false
 }
@@ -59,9 +62,23 @@ variable "tags" {
 }
 
 variable "secret_name" {
-  default = ""
-}
-
-variable "route53_db_record" {
   type = string
 }
+variable "db_record" {
+  default = "db"
+}
+variable "share_with" {
+  type = list(string)
+}
+
+variable "engine" {
+  type    = string
+  default = "postgres"
+}
+
+variable "enabled_cloudwatch_logs_exports" {
+  type = list(string)
+}
+#variable "kms_key_id" {
+#  type = string
+#}
