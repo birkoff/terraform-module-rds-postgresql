@@ -116,13 +116,13 @@ module "rds" {
   ]
 }
 
-variable "dns_private_zone" {
+variable "dns_zone_id" {
   type = string
 }
 module "route53_record" {
   depends_on = [module.rds]
   source     = "git::github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records"
-  zone_id    = var.dns_private_zone
+  zone_id    = var.dns_zone_id
   create     = true
   records = [
     {
