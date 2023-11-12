@@ -1,7 +1,8 @@
 data "aws_caller_identity" "current" {}
+
 locals {
   default_identifier = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-  identifiers        = length(var.share_with) > 0 ? concat(var.share_with, local.default_identifier) : local.default_identifier
+  identifiers        = compact(concat(var.share_with, local.default_identifier))
 }
 
 
@@ -28,7 +29,9 @@ module "security_group" {
     },
   ]
 }
-
+variable "kms_key_id" {
+  type = string
+}
 module "secrets_manager" {
   depends_on              = [module.rds, random_password.rds_password]
   source                  = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git//"
@@ -38,25 +41,26 @@ module "secrets_manager" {
   # Policy
   create_policy       = length(var.share_with) > 0 ? true : false
   block_public_policy = true
-  kms_key_id          = var.kms_key_id
-#  policy_statements = {
-#    read = {
-#      sid = "AllowAccountRead"
-#      principals = [{
-#        type        = "AWS"
-#        identifiers = "${toset(local.identifiers)}" #["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::225725557140:root", "arn:aws:iam::443207202695:root"]
-#      }]
-#      actions = [
-#        "secretsmanager:GetSecretValue",
-#        "secretsmanager:DescribeSecret",
-#        "secretsmanager:GetRandomPassword",
-#        "secretsmanager:GetResourcePolicy",
-#        "secretsmanager:ListSecretVersionIds",
-#        "secretsmanager:ListSecrets"
-#      ]
-#      resources = ["*"]
-#    }
-#  }
+  kms_key_id          = var.kms_key_id != "" ? var.kms_key_id : null
+  create_policy       = length(var.share_with) > 0 ? true : false
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = local.identifiers #["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::225725557140:root", "arn:aws:iam::443207202695:root"]
+      }]
+      actions = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetRandomPassword",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:ListSecretVersionIds",
+        "secretsmanager:ListSecrets"
+      ]
+      resources = ["*"]
+    }
+  }
 
   secret_string = jsonencode({
     engine   = "postgresql",
@@ -118,12 +122,14 @@ module "rds" {
 
 variable "dns_zone_id" {
   type = string
+  default = null
 }
+
 module "route53_record" {
   depends_on = [module.rds]
   source     = "git::github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records"
-  zone_id    = var.dns_zone_id
-  create     = true
+  zone_id    = try(var.dns_zone_id, null)
+  create     = try(var.dns_zone_id, false)
   records = [
     {
       name    = var.db_record
