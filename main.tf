@@ -42,7 +42,6 @@ module "secrets_manager" {
   create_policy       = length(var.share_with) > 0 ? true : false
   block_public_policy = true
   kms_key_id          = var.kms_key_id != "" ? var.kms_key_id : null
-  create_policy       = length(var.share_with) > 0 ? true : false
   policy_statements = {
     read = {
       sid = "AllowAccountRead"
