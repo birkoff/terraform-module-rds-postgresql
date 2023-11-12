@@ -36,9 +36,9 @@ module "secrets_manager" {
   description             = "Credentials of RDS Database"
   recovery_window_in_days = 7
   # Policy
-#  create_policy       = length(var.share_with) > 0 ? true : false
+  create_policy       = length(var.share_with) > 0 ? true : false
   block_public_policy = true
-#  kms_key_id          = var.kms_key_id
+  kms_key_id          = var.kms_key_id
 #  policy_statements = {
 #    read = {
 #      sid = "AllowAccountRead"
