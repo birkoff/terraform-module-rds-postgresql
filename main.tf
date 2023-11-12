@@ -129,7 +129,7 @@ module "route53_record" {
   depends_on = [module.rds]
   source     = "git::github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records"
   zone_id    = try(var.dns_zone_id, null)
-  create     = try(var.dns_zone_id, false)
+  create     = var.dns_zone_id != "" ? true : false
   records = [
     {
       name    = var.db_record
