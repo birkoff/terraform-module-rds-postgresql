@@ -79,6 +79,4 @@ variable "engine" {
 variable "enabled_cloudwatch_logs_exports" {
   type = list(string)
 }
-#variable "kms_key_id" {
-#  type = string
-#}
+
