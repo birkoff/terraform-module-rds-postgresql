@@ -31,6 +31,7 @@ module "security_group" {
 }
 variable "kms_key_id" {
   type = string
+  default = ""
 }
 module "secrets_manager" {
   depends_on              = [module.rds, random_password.rds_password]
