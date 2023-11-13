@@ -124,12 +124,16 @@ variable "dns_zone_id" {
   type = string
   default = null
 }
-
+variable "dns_zone_name" {
+  type = string
+  default = null
+}
 module "route53_record" {
   depends_on = [module.rds]
   source     = "git::github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records"
   zone_id    = try(var.dns_zone_id, null)
-  create     = var.dns_zone_id != "" ? true : false
+  zone_name    = try(var.dns_zone_name, null)
+  # create     = var.dns_zone_id != "" ? true : false
   private_zone = true
   records = [
     {
