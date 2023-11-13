@@ -130,6 +130,7 @@ module "route53_record" {
   source     = "git::github.com/terraform-aws-modules/terraform-aws-route53.git//modules/records"
   zone_id    = try(var.dns_zone_id, null)
   create     = var.dns_zone_id != "" ? true : false
+  private_zone = true
   records = [
     {
       name    = var.db_record
