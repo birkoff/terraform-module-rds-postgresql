@@ -65,6 +65,7 @@ module "secrets_manager" {
   secret_string = jsonencode({
     engine   = "postgresql",
     host     = module.rds.db_instance_address,
+    dns_record = "${var.db_record}.${var.dns_zone_name}",
     username = module.rds.db_instance_username,
     password = random_password.rds_password.result,
     port     = module.rds.db_instance_port,
