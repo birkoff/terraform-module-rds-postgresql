@@ -6,4 +6,5 @@ data "aws_secretsmanager_secret_version" "credentials" {
 }
 output "secret_value" {
   value = data.aws_secretsmanager_secret_version.credentials.secret_string
+  sensitive = true
 }
